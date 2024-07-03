@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='deepdefend',
-    version='0.1.0',
+    version='{{VERSION_PLACEHOLDER}}',
     author='Infinitode Pty Ltd',
     author_email='infinitode.ltd@gmail.com',
     description='An open-source Python library for adversarial attacks and defenses in deep learning models.',
@@ -25,6 +25,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
     python_requires='>=3.6',
 )

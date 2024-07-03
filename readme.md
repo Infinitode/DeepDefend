@@ -1,5 +1,5 @@
-# DeepDefend 0.1.0
-![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
+# DeepDefend 0.1.1
+![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 ![Code Size](https://img.shields.io/github/languages/code-size/infinitode/deepdefend)
 ![Downloads](https://pepy.tech/badge/deepdefend)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
@@ -28,7 +28,7 @@ DeepDefend supports the following Python versions:
 - Python 3.8
 - Python 3.9
 - Python 3.10
-- Python 3.11
+- Python 3.11 or later
 
 Please ensure that you have one of these Python versions installed before using DeepDefend. DeepDefend may not work as expected on lower versions of Python than the supported.
 
@@ -43,7 +43,7 @@ Please ensure that you have one of these Python versions installed before using 
 
 ```python
 import tensorflow as tf
-from deepdefend.attacks import fgsm, pgd, bim
+from deepdefend.attacks import fgsm, pgd, bim, cw, deepfool, jsma
 
 # Load a pre-trained TensorFlow model
 model = ...
@@ -58,18 +58,30 @@ adversarial_example_fgsm = fgsm(model, x_example, y_example, epsilon=0.01)
 # Perform PGD attack on the example data
 adversarial_example_pgd = pgd(model, x_example, y_example, epsilon=0.01, alpha=0.01, num_steps=10)
 
-# Perfrom BIM attack on the example data
+# Perform BIM attack on the example data
 adversarial_example_bim = bim(model, x_example, y_example, epsilon=0.01, alpha=0.01, num_steps=10)
+
+# Perform CW attack on the example data
+adversarial_example_cw = cw(model, x_example, y_example, epsilon=0.01, c=1, kappa=0, num_steps=10, alpha=0.01)
+
+# Perform Deepfool attack on the example data
+adversarial_example_deepfool = deepfool(model, x_example, y_example, num_steps=10)
+
+# Perform JSMA attack on the example data
+adversarial_example_jsma(model, x_example, y_example, theta=0.1, gamma=0.1, num_steps=10)
 ```
 
 ### Adversarial Defenses
 
 ```python
 import tensorflow as tf
-from deepdefend.defenses import adversarial_training, feature_squeezing
+from deepdefend.defenses import adversarial_training, feature_squeezing, gradient_masking, input_transformation, defensive_distillation
 
 # Load a pre-trained TensorFlow model
 model = ...
+
+# Teacher model for distillation
+teacher_model = ...
 
 # Load training data
 x_train, y_train = ...  # training data and labels
@@ -79,6 +91,15 @@ defended_model = adversarial_training(model, x_train, y_train, epsilon=0.01)
 
 # Feature squeezing defense
 defended_model_squeezed = feature_squeezing(model, bit_depth=4)
+
+# Gradient masking defense
+defended_model_masking = gradient_masking(model, mask_threshold=0.1)
+
+# Input transformation defense
+defended_model_transformation = input_transformation(model, transformation_function=None)
+
+# Defensive distillation defense
+defended_model_distillation = defensive_distillation(model, teacher_model, temperature=2)
 ```
 
 ## Contributing
