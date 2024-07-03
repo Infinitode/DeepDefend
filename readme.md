@@ -1,4 +1,4 @@
-# DeepDefend 0.1.1
+# DeepDefend
 ![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 ![Code Size](https://img.shields.io/github/languages/code-size/infinitode/deepdefend)
 ![Downloads](https://pepy.tech/badge/deepdefend)
@@ -10,6 +10,11 @@ An open-source Python library for adversarial attacks and defenses in deep learn
 ## Notice
 
 DeepDefend has not yet been fully tested. Please report any issues you may encounter when using DeepDefend.
+
+## Changes in 0.1.1:
+We've updated DeepDefend, here's what's new:
+- 3 new functions under `deepdefend.attacks`
+- 3 new function under `deepdefend.defenses`
 
 ## Installation
 
