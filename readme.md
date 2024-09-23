@@ -73,7 +73,7 @@ adversarial_example_cw = cw(model, x_example, y_example, epsilon=0.01, c=1, kapp
 adversarial_example_deepfool = deepfool(model, x_example, y_example, num_steps=10)
 
 # Perform JSMA attack on the example data
-adversarial_example_jsma(model, x_example, y_example, theta=0.1, gamma=0.1, num_steps=10)
+adversarial_example_jsma = jsma(model, x_example, y_example, theta=0.1, gamma=0.1, num_steps=10)
 ```
 
 ### Adversarial Defenses
