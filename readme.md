@@ -11,7 +11,7 @@ An open-source Python library for adversarial attacks and defenses in deep learn
 
 DeepDefend has not yet been fully tested. Please report any issues you may encounter when using DeepDefend.
 
-## Changes in 0.1.1:
+## Changes in 0.1.2:
 We've updated DeepDefend, here's what's new:
 - 3 new functions under `deepdefend.attacks`
 - 3 new functions under `deepdefend.defenses`
