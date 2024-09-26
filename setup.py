@@ -1,12 +1,15 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name='deepdefend',
     version='{{VERSION_PLACEHOLDER}}',
     author='Infinitode Pty Ltd',
     author_email='infinitode.ltd@gmail.com',
-    description='An open-source Python library for adversarial attacks and defenses in deep learning models.',
-    long_description='An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.',
+    description='An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.',
+    long_description= long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/infinitode/deepdefend',
     packages=find_packages(),
