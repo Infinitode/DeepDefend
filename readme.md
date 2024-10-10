@@ -7,9 +7,8 @@
 
 An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.
 
-## Notice
-
-DeepDefend has not yet been fully tested. Please report any issues you may encounter when using DeepDefend.
+> [!NOTE]
+> DeepDefend has not yet been fully tested. Please report any issues you may encounter when using DeepDefend.
 
 ## Changes in 0.1.2:
 We've updated DeepDefend, here's what's new:
