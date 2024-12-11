@@ -112,7 +112,7 @@ Contributions are welcome! If you encounter any issues, have suggestions, or wan
 
 ## License
 
-DeepDefend is released under the terms of the **MIT License (Modified)**. Please see the [LICENSE](https://github.com/infinitode/deepdefend/blob/main/LICENSE) file for the full text.
+DeepDefend is released under the terms of the **MIT License (Modified)**. Please see the [LICENSE](https://github.com/infinitode/deepdefend/blob/master/LICENSE) file for the full text.
 
 **Modified License Clause**
 
@@ -122,4 +122,4 @@ The modified license clause grants users the permission to make derivative works
 
 By enforcing this distinction, it aims to prevent direct publishing of the source code without changes while allowing users to create derivative works that incorporate the code but are not exactly the same.
 
-Please read the full license terms in the [LICENSE](https://github.com/infinitode/deepdefend/blob/main/LICENSE) file for complete details.
+Please read the full license terms in the [LICENSE](https://github.com/infinitode/deepdefend/blob/master/LICENSE) file for complete details.
