@@ -44,6 +44,6 @@ To maintain a positive and collaborative community, we ask that all contributors
    Offer helpful and actionable suggestions during code reviews.
 
 3. **Follow Licensing Requirements**  
-   Ensure that any derivative works comply with the [license](https://github.com/infinitode/DeepDefend/blob/main/LICENSE).
+   Ensure that any derivative works comply with the [license](https://github.com/infinitode/DeepDefend/blob/master/LICENSE).
 
-By contributing, you agree to abide by these guidelines and this project's [license](https://github.com/infinitode/DeepDefend/blob/main/LICENSE). Thank you for helping make **DeepDefend** better!
+By contributing, you agree to abide by these guidelines and this project's [license](https://github.com/infinitode/DeepDefend/blob/master/LICENSE). Thank you for helping make **DeepDefend** better!
