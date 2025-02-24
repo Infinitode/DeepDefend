@@ -1,5 +1,5 @@
 # DeepDefend
-![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
+![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)
 ![Code Size](https://img.shields.io/github/languages/code-size/infinitode/deepdefend)
 ![Downloads](https://pepy.tech/badge/deepdefend)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
