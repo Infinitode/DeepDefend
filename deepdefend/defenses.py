@@ -8,6 +8,11 @@ Available functions:
 - `gradient_masking(model, mask_threshold=0.1)`: Gradient Masking defense.
 - `input_transformation(model, transformation_function=None)`: Input Transformation defense.
 - `defensive_distillation(model, teacher_model, temperature=2)`: Defensive Distillation defense.
+- `randomized_smoothing(model, noise_level=0.1)`: Randomized Smoothing defense.
+- `feature_denoising(model)`: Feature Denoising defense.
+- `thermometer_encoding(model, num_bins=10)`: Thermometer Encoding defense.
+- `adversarial_logit_pairing(model, paired_model)`: Adversarial Logit Pairing defense.
+- `spatial_smoothing(model, kernel_size=3)`: Spatial Smoothing defense.
 """
 
 import numpy as np
@@ -149,4 +154,124 @@ def defensive_distillation(model, teacher_model, temperature=2):
         return tf.keras.losses.CategoricalCrossentropy()(y_true, y_pred) + temperature**2 * tf.keras.losses.CategoricalCrossentropy()(teacher_predictions, y_pred)
 
     defended_model.compile(optimizer='adam', loss=distilled_loss, metrics=['accuracy'])
+    return defended_model
+
+def randomized_smoothing(model, noise_level=0.1):
+    """
+    Randomized Smoothing defense.
+
+    Randomized smoothing adds random noise to the input data to make the model more robust
+    to adversarial attacks.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+        noise_level (float): The standard deviation of the Gaussian noise (default: 0.1).
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with randomized smoothing defense.
+    """
+    defended_model = tf.keras.models.clone_model(model)
+    defended_model.set_weights(model.get_weights())
+
+    def add_noise(x):
+        noise = tf.random.normal(shape=tf.shape(x), mean=0.0, stddev=noise_level, dtype=tf.float32)
+        return x + noise
+
+    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
+    defended_model.layers[0].input = add_noise(defended_model.layers[0].input)
+    return defended_model
+
+def feature_denoising(model):
+    """
+    Feature Denoising defense.
+
+    Feature denoising applies denoising operations to the input data to remove adversarial perturbations.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with feature denoising defense.
+    """
+    defended_model = tf.keras.models.clone_model(model)
+    defended_model.set_weights(model.get_weights())
+
+    def denoise(x):
+        return tf.image.total_variation(x)
+
+    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
+    defended_model.layers[0].input = denoise(defended_model.layers[0].input)
+    return defended_model
+
+def thermometer_encoding(model, num_bins=10):
+    """
+    Thermometer Encoding defense.
+
+    Thermometer encoding discretizes the input features into bins, making it harder for adversarial perturbations
+    to affect the model.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+        num_bins (int): The number of bins for encoding (default: 10).
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with thermometer encoding defense.
+    """
+    defended_model = tf.keras.models.clone_model(model)
+    defended_model.set_weights(model.get_weights())
+
+    def encode(x):
+        x = tf.clip_by_value(x, 0, 1)
+        x = tf.floor(x * num_bins) / num_bins
+        return x
+
+    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
+    defended_model.layers[0].input = encode(defended_model.layers[0].input)
+    return defended_model
+
+def adversarial_logit_pairing(model, paired_model):
+    """
+    Adversarial Logit Pairing (ALP) defense.
+
+    Adversarial logit pairing encourages the logits of adversarial examples to be similar to those of clean examples.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+        paired_model (tensorflow.keras.Model): The paired model for logit pairing.
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with adversarial logit pairing defense.
+    """
+    defended_model = tf.keras.models.clone_model(model)
+    defended_model.set_weights(model.get_weights())
+
+    def alp_loss(y_true, y_pred):
+        clean_logits = model(y_true)
+        adv_logits = paired_model(y_true)
+        return tf.keras.losses.CategoricalCrossentropy()(y_true, y_pred) + tf.reduce_mean(tf.square(clean_logits - adv_logits))
+
+    defended_model.compile(optimizer='adam', loss=alp_loss, metrics=['accuracy'])
+    return defended_model
+
+def spatial_smoothing(model, kernel_size=3):
+    """
+    Spatial Smoothing defense.
+
+    Spatial smoothing applies a smoothing filter to the input data to remove adversarial perturbations.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+        kernel_size (int): The size of the smoothing kernel (default: 3).
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with spatial smoothing defense.
+    """
+    defended_model = tf.keras.models.clone_model(model)
+    defended_model.set_weights(model.get_weights())
+
+    def smooth(x):
+        return tf.nn.avg_pool2d(x, ksize=kernel_size, strides=1, padding='SAME')
+
+    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
+    defended_model.layers[0].input = smooth(defended_model.layers[0].input)
     return defended_model

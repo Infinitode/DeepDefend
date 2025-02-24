@@ -7,8 +7,11 @@
 
 An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.
 
+## Changes in 0.1.3:
+- 5 new functions in `defenses.py`, including: Randomized Smoothing, Feature Denoising, Thermometer Encoding, Adversarial Logit Pairing (ALP), and Spatial Smoothing.
+
 > [!NOTE]
-> DeepDefend has not yet been fully tested. Please report any issues you may encounter when using DeepDefend.
+> Updates to DeepDefend's attack module will be less frequent due to the potential misuse of adversarial attacks on AI models.
 
 ## Changes in 0.1.2:
 We've updated DeepDefend, here's what's new:
