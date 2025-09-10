@@ -7,6 +7,10 @@
 
 An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.
 
+## Changes in 0.1.4:
+- Added SPSA (Simultaneous Perturbation Stochastic Approximation) attack.
+- Added JPEG Compression defense.
+
 ## Changes in 0.1.3:
 - 5 new functions in `defenses.py`, including: Randomized Smoothing, Feature Denoising, Thermometer Encoding, Adversarial Logit Pairing (ALP), and Spatial Smoothing.
 
@@ -76,13 +80,16 @@ adversarial_example_deepfool = deepfool(model, x_example, y_example, num_steps=1
 
 # Perform JSMA attack on the example data
 adversarial_example_jsma = jsma(model, x_example, y_example, theta=0.1, gamma=0.1, num_steps=10)
+
+# Perform SPSA attack on the example data
+adversarial_example_spsa = spsa(model, x_example, y_example, epsilon=0.01, num_steps=10)
 ```
 
 ### Adversarial Defenses
 
 ```python
 import tensorflow as tf
-from deepdefend.defenses import adversarial_training, feature_squeezing, gradient_masking, input_transformation, defensive_distillation
+from deepdefend.defenses import adversarial_training, feature_squeezing, gradient_masking, input_transformation, defensive_distillation, jpeg_compression
 
 # Load a pre-trained TensorFlow model
 model = ...
@@ -107,6 +114,9 @@ defended_model_transformation = input_transformation(model, transformation_funct
 
 # Defensive distillation defense
 defended_model_distillation = defensive_distillation(model, teacher_model, temperature=2)
+
+# JPEG compression defense
+defended_model_jpeg = jpeg_compression(model, quality=75)
 ```
 
 ## Contributing
