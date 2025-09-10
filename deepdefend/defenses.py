@@ -13,6 +13,7 @@ Available functions:
 - `thermometer_encoding(model, num_bins=10)`: Thermometer Encoding defense.
 - `adversarial_logit_pairing(model, paired_model)`: Adversarial Logit Pairing defense.
 - `spatial_smoothing(model, kernel_size=3)`: Spatial Smoothing defense.
+- `jpeg_compression(model, quality=75)`: JPEG Compression defense.
 """
 
 import numpy as np
@@ -118,18 +119,16 @@ def input_transformation(model, transformation_function=None):
     Returns:
         defended_model (tensorflow.keras.Model): The model with input transformation defense.
     """
-    defended_model = tf.keras.models.clone_model(model)
-    defended_model.set_weights(model.get_weights())
-
     def transformed_input(x):
         if transformation_function is not None:
             return transformation_function(x)
         else:
             return x
 
-    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
-    defended_model.layers[0].input = transformed_input(defended_model.layers[0].input)
-    return defended_model
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = transformed_input(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)
 
 def defensive_distillation(model, teacher_model, temperature=2):
     """
@@ -170,16 +169,14 @@ def randomized_smoothing(model, noise_level=0.1):
     Returns:
         defended_model (tensorflow.keras.Model): The model with randomized smoothing defense.
     """
-    defended_model = tf.keras.models.clone_model(model)
-    defended_model.set_weights(model.get_weights())
-
     def add_noise(x):
         noise = tf.random.normal(shape=tf.shape(x), mean=0.0, stddev=noise_level, dtype=tf.float32)
         return x + noise
 
-    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
-    defended_model.layers[0].input = add_noise(defended_model.layers[0].input)
-    return defended_model
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = add_noise(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)
 
 def feature_denoising(model):
     """
@@ -193,15 +190,13 @@ def feature_denoising(model):
     Returns:
         defended_model (tensorflow.keras.Model): The model with feature denoising defense.
     """
-    defended_model = tf.keras.models.clone_model(model)
-    defended_model.set_weights(model.get_weights())
-
     def denoise(x):
         return tf.image.total_variation(x)
 
-    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
-    defended_model.layers[0].input = denoise(defended_model.layers[0].input)
-    return defended_model
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = denoise(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)
 
 def thermometer_encoding(model, num_bins=10):
     """
@@ -217,17 +212,15 @@ def thermometer_encoding(model, num_bins=10):
     Returns:
         defended_model (tensorflow.keras.Model): The model with thermometer encoding defense.
     """
-    defended_model = tf.keras.models.clone_model(model)
-    defended_model.set_weights(model.get_weights())
-
     def encode(x):
         x = tf.clip_by_value(x, 0, 1)
         x = tf.floor(x * num_bins) / num_bins
         return x
 
-    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
-    defended_model.layers[0].input = encode(defended_model.layers[0].input)
-    return defended_model
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = encode(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)
 
 def adversarial_logit_pairing(model, paired_model):
     """
@@ -266,12 +259,33 @@ def spatial_smoothing(model, kernel_size=3):
     Returns:
         defended_model (tensorflow.keras.Model): The model with spatial smoothing defense.
     """
-    defended_model = tf.keras.models.clone_model(model)
-    defended_model.set_weights(model.get_weights())
-
     def smooth(x):
         return tf.nn.avg_pool2d(x, ksize=kernel_size, strides=1, padding='SAME')
 
-    defended_model.layers[0].input = tf.keras.Input(shape=model.input_shape[1:])
-    defended_model.layers[0].input = smooth(defended_model.layers[0].input)
-    return defended_model
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = smooth(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)
+
+
+def jpeg_compression(model, quality=75):
+    """
+    JPEG Compression defense.
+
+    This defense compresses the input image using JPEG, which can remove high-frequency
+    adversarial perturbations.
+
+    Parameters:
+        model (tensorflow.keras.Model): The model to defend.
+        quality (int): The JPEG compression quality (0-100), default is 75.
+
+    Returns:
+        defended_model (tensorflow.keras.Model): The model with JPEG compression defense.
+    """
+    def compress(x):
+        return tf.map_fn(lambda img: tf.cast(tf.image.decode_jpeg(tf.image.encode_jpeg(tf.cast(img * 255, tf.uint8), quality=quality), channels=3), tf.float32) / 255.0, x)
+
+    input_layer = tf.keras.Input(shape=model.input_shape[1:])
+    x = compress(input_layer)
+    predictions = model(x)
+    return tf.keras.Model(inputs=input_layer, outputs=predictions)

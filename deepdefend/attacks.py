@@ -8,6 +8,7 @@ Available functions:
 - `cw(model, x, y, epsilon=0.01, c=1, kappa=0, num_steps=10, alpha=0.01)`: Carlini & Wagner (C&W) attack.
 - `deepfool(model, x, y, num_steps=10)`: DeepFool attack.
 - `jsma(model, x, y, theta=0.1, gamma=0.1, num_steps=10)`: Jacobian-based Saliency Map Attack (JSMA).
+- `spsa(model, x, y, epsilon=0.01, num_steps=10)`: Simultaneous Perturbation Stochastic Approximation (SPSA) attack.
 """
 
 import numpy as np
@@ -219,5 +220,60 @@ def jsma(model, x, y, theta=0.1, gamma=0.1, num_steps=10):
                 adversarial_example[0, perturbed_pixels[0][i], perturbed_pixels[1][i], perturbed_pixels[2][i]] += gamma
             else:
                 adversarial_example[0, perturbed_pixels[0][i], perturbed_pixels[1][i], perturbed_pixels[2][i]] -= gamma
+
+    return adversarial_example.numpy()
+
+
+def spsa(model, x, y, epsilon=0.01, num_steps=10, learning_rate=0.01, delta=0.01, spsa_samples=128):
+    """
+    Simultaneous Perturbation Stochastic Approximation (SPSA) attack.
+
+    Parameters:
+        model (tensorflow.keras.Model): The target model to attack.
+        x (numpy.ndarray): The input example to attack.
+        y (numpy.ndarray): The true labels of the input example.
+        epsilon (float): The magnitude of the perturbation (default: 0.01).
+        num_steps (int): The number of SPSA iterations (default: 10).
+        learning_rate (float): The learning rate for the ADAM optimizer (default: 0.01).
+        delta (float): The perturbation size for SPSA (default: 0.01).
+        spsa_samples (int): The number of samples for SPSA (default: 128).
+
+    Returns:
+        adversarial_example (numpy.ndarray): The perturbed input example.
+    """
+    if x.shape[0] != 1:
+        raise ValueError("For SPSA, input tensor x must have batch_size of 1.")
+
+    tf_dtype = tf.as_dtype("float32")
+    optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
+
+    def loss_fn(data, label):
+        logits = model(data)
+        label = tf.cast(label, tf.int64)
+        loss = tf.keras.losses.sparse_categorical_crossentropy(label, logits)
+        return loss
+
+    perturbation = tf.zeros_like(x, dtype=tf_dtype)
+
+    for _ in range(num_steps):
+        # SPSA gradient approximation
+        x_shape = x.shape
+        delta_x = delta * tf.sign(tf.random.uniform([spsa_samples // 2] + list(x_shape[1:]), minval=-1.0, maxval=1.0, dtype=tf_dtype))
+        delta_x = tf.concat([delta_x, -delta_x], axis=0)
+
+        y_tiled = tf.tile(y, [spsa_samples])
+
+        loss_vals = loss_fn(tf.tile(x, [spsa_samples, 1, 1, 1]) + delta_x, y_tiled)
+        loss_vals = tf.reshape(loss_vals, [spsa_samples] + [1] * (len(x_shape) - 1))
+
+        grad = tf.reduce_mean(loss_vals * delta_x, axis=0, keepdims=True) / delta
+
+        # ADAM update
+        optimizer.apply_gradients([(grad[0], perturbation)])
+
+        # Projection
+        adversarial_example = x + tf.clip_by_value(perturbation, -epsilon, epsilon)
+        adversarial_example = tf.clip_by_value(adversarial_example, 0, 1)
+        perturbation.assign(adversarial_example - x)
 
     return adversarial_example.numpy()
