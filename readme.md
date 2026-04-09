@@ -5,7 +5,18 @@
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/deepdefend)
 
+[Documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/deepdefend-package-documentation)
+
 An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems.
+
+## Changes in 0.1.5:
+- Added MIM (Momentum Iterative Method) and EAD (Elastic Net Attack) attacks.
+- Added Word Swap and Character Swap attacks for text-based models.
+- Added Pixel Deflection, Gaussian Blur, Total Variation Minimization, and Median Smoothing defenses.
+- Added Word Masking defense for text-based models.
+- Added a comprehensive support table for different model types.
+- Fixed logical errors in several defense functions.
+- Improved Keras compatibility for training-time defenses.
 
 ## Changes in 0.1.4:
 - Added SPSA (Simultaneous Perturbation Stochastic Approximation) attack.
@@ -48,6 +59,40 @@ Please ensure that you have one of these Python versions installed before using 
 - Adversarial Attacks: Generate adversarial examples to evaluate model vulnerabilities.
 - Adversarial Defenses: Employ various methods to protect models against adversarial attacks.
 
+## Supported Model Types
+
+| Feature | Image | Text | Numeric | Classification |
+|---------|:-----:|:----:|:-------:|:--------------:|
+| **Attacks** | | | | |
+| FGSM | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| PGD | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| BIM | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| CW | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| DeepFool | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| JSMA | ✅ | ❌ | ❌ | ✅ |
+| SPSA | ✅ | ❌ | ✅ | ✅ |
+| MIM | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| EAD | ✅ | ✅ (Embeddings) | ✅ | ✅ |
+| Word Swap | ❌ | ✅ | ❌ | ✅ |
+| Char Swap | ❌ | ✅ | ❌ | ✅ |
+| **Defenses** | | | | |
+| Adversarial Training | ✅ | ✅ | ✅ | ✅ |
+| Feature Squeezing | ✅ | ❌ | ✅ | ✅ |
+| Gradient Masking | ✅ | ✅ | ✅ | ✅ |
+| Input Transformation | ✅ | ✅ | ✅ | ✅ |
+| Defensive Distillation| ✅ | ✅ | ✅ | ✅ |
+| Randomized Smoothing | ✅ | ❌ | ✅ | ✅ |
+| Feature Denoising | ✅ | ❌ | ❌ | ✅ |
+| Thermometer Encoding | ✅ | ❌ | ✅ | ✅ |
+| ALP | ✅ | ✅ | ✅ | ✅ |
+| Spatial Smoothing | ✅ | ❌ | ❌ | ✅ |
+| JPEG Compression | ✅ | ❌ | ❌ | ✅ |
+| Pixel Deflection | ✅ | ❌ | ❌ | ✅ |
+| Gaussian Blur | ✅ | ❌ | ❌ | ✅ |
+| TV Minimization | ✅ | ❌ | ❌ | ✅ |
+| Word Masking | ❌ | ✅ | ❌ | ✅ |
+| Median Smoothing | ✅ | ❌ | ❌ | ✅ |
+
 ## Usage
 
 ### Adversarial Attacks
@@ -83,13 +128,27 @@ adversarial_example_jsma = jsma(model, x_example, y_example, theta=0.1, gamma=0.
 
 # Perform SPSA attack on the example data
 adversarial_example_spsa = spsa(model, x_example, y_example, epsilon=0.01, num_steps=10)
+
+# Perform MIM attack on the example data
+adversarial_example_mim = mim(model, x_example, y_example, epsilon=0.01, alpha=0.01, num_steps=10)
+
+# Perform EAD attack on the example data
+adversarial_example_ead = ead(model, x_example, y_example, epsilon=0.01, beta=0.01, num_steps=10)
+
+# Perform Word Swap attack on text data
+text_data = "The movie was great"
+swaps = {"great": "terrible"}
+perturbed_text = word_swap(text_data, swap_dict=swaps)
+
+# Perform Character Swap attack on text data
+perturbed_text_char = char_swap(text_data, swap_prob=0.1)
 ```
 
 ### Adversarial Defenses
 
 ```python
 import tensorflow as tf
-from deepdefend.defenses import adversarial_training, feature_squeezing, gradient_masking, input_transformation, defensive_distillation, jpeg_compression
+from deepdefend.defenses import *
 
 # Load a pre-trained TensorFlow model
 model = ...
@@ -117,6 +176,37 @@ defended_model_distillation = defensive_distillation(model, teacher_model, tempe
 
 # JPEG compression defense
 defended_model_jpeg = jpeg_compression(model, quality=75)
+
+# Randomized smoothing defense
+defended_model_smoothing = randomized_smoothing(model, noise_level=0.1)
+
+# Feature denoising defense
+defended_model_denoising = feature_denoising(model)
+
+# Thermometer encoding defense
+defended_model_thermometer = thermometer_encoding(model, num_bins=10)
+
+# Adversarial Logit Pairing (ALP) defense
+defended_model_alp = adversarial_logit_pairing(model, paired_model=model)
+
+# Spatial smoothing defense
+defended_model_spatial = spatial_smoothing(model, kernel_size=3)
+
+# Pixel deflection defense
+defended_model_deflection = pixel_deflection(model, deflection_count=100, window_size=10)
+
+# Gaussian blur defense
+defended_model_blur = gaussian_blur(model, kernel_size=3, sigma=1.0)
+
+# TV Minimization defense
+defended_model_tv = total_variation_minimization(model, iterations=10)
+
+# Median smoothing defense
+defended_model_median = median_smoothing(model, kernel_size=3)
+
+# Word masking defense for text
+text_data = "The movie was great"
+defended_text = word_masking(text_data, mask_prob=0.2)
 ```
 
 ## Contributing
