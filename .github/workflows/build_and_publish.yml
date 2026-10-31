@@ -3,32 +3,63 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 on:
   push:
     tags:
-       - '*'
+      - "v*"
+
+# Least privilege at the workflow level; the publish job widens `id-token` only.
+permissions:
+  contents: read
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI
+  build:
+    name: Build and verify distributions
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.12'
-    - name: Install pypa/setuptools
-      run: >-
-        python -m
-        pip install setuptools wheel
-    - name: Extract tag name
-      id: tag
-      run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
-    - name: Update version in setup.py
-      run: >-
-        sed -i "s/{{VERSION_PLACEHOLDER}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-    - name: Build a binary wheel
-      run: >-
-        python setup.py sdist bdist_wheel
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip build twine
+      - name: Verify the tag matches the packaged version
+        run: |
+          python - <<'PY'
+          import os, sys, tomllib
+          tag = os.environ["GITHUB_REF_NAME"].lstrip("v")
+          with open("pyproject.toml", "rb") as fh:
+              version = tomllib.load(fh)["project"]["version"]
+          if tag != version:
+              sys.exit(f"Tag {tag!r} does not match pyproject version {version!r}")
+          print(f"Building {version}")
+          PY
+      - name: Run the test-suite before publishing
+        run: |
+          python -m pip install -e ".[dev]"
+          python -m pytest -q
+      - name: Build sdist and wheel
+        run: |
+          python -m build
+          python -m twine check dist/*
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/deepdefend/
+    permissions:
+      # Trusted Publishing (OIDC). No long-lived API token is stored.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1

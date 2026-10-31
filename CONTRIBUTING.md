@@ -7,14 +7,28 @@ Thank you for considering contributing to **DeepDefend**! Contributions, whether
 1. **Fork the Repository**  
    Create a fork of this repository to your GitHub account and clone it locally.
 
-2. **Set Up the Environment**  
-   Ensure you have Python 3.6+ installed. You should also install compatible versions of the necessary dependencies for the project.
+2. **Set Up the Environment**
+   Install Python 3.9+ and the development dependencies:
 
-3. **Run Tests**  
-   Before making changes, run tests to confirm that everything works.
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+3. **Run Tests**
+   Before and after making changes, run the test-suite and the linter:
+
+   ```bash
+   pytest          # 171 tests covering attacks, defenses and the public API
+   ruff check .    # lint
+   ```
+
+   Both run in CI on every pull request (Python 3.10 – 3.12). New behaviour
+   should come with a test; bug fixes should come with a test that fails
+   before the fix.
 
 > [!TIP]
-> We sometimes include testing scripts in our projects for easy testing.
+> The test-suite uses a tiny synthetic dataset and a small CNN, so the whole
+> run takes well under a minute.
 
 ## How to Contribute
 
@@ -32,6 +46,7 @@ Thank you for considering contributing to **DeepDefend**! Contributions, whether
    - Push your changes to a feature branch in your fork.
    - Submit a pull request with a detailed explanation of what you've changed or added.
    - Ensure your PR passes all automated tests and adheres to the contribution guidelines.
+   - If you change numerical behaviour, add an entry to `CHANGELOG.md`.
 
 ## Community Guidelines
 
