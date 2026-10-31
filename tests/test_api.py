@@ -12,7 +12,7 @@ EXPECTED_ATTACKS = [
     "word_swap", "char_swap",
 ]
 EXPECTED_DEFENSES = [
-    "adversarial_training", "feature_squeezing", "gradient_masking",
+    "adversarial_training", "feature_squeezing",
     "input_transformation", "defensive_distillation", "randomized_smoothing",
     "feature_denoising", "thermometer_encoding", "adversarial_logit_pairing",
     "spatial_smoothing", "jpeg_compression", "pixel_deflection", "gaussian_blur",

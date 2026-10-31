@@ -47,7 +47,6 @@ _DEFENSES = frozenset(
         "feature_denoising",
         "feature_squeezing",
         "gaussian_blur",
-        "gradient_masking",
         "input_transformation",
         "jpeg_compression",
         "median_smoothing",

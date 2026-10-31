@@ -18,7 +18,7 @@ Thank you for considering contributing to **DeepDefend**! Contributions, whether
    Before and after making changes, run the test-suite and the linter:
 
    ```bash
-   pytest          # 171 tests covering attacks, defenses and the public API
+   pytest          # 170 tests covering attacks, defenses and the public API
    ruff check .    # lint
    ```
 

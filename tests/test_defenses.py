@@ -247,12 +247,10 @@ def test_adversarial_training_generates_examples_in_batches(dataset, monkeypatch
     assert calls == [8, 8]
 
 
-def test_gradient_masking_warns_and_fits(untrained_model, batch):
-    x, y = batch
-    with pytest.warns(RuntimeWarning):
-        wrapped = defenses.gradient_masking(untrained_model, mask_threshold=0.0)
-    wrapped.compile(optimizer="adam", loss="categorical_crossentropy")
-    wrapped.fit(x, np.eye(3)[y], epochs=1, verbose=0)
+def test_gradient_masking_was_removed():
+    """Gradient masking is a false defense; it is no longer part of the API."""
+    assert not hasattr(defenses, "gradient_masking")
+    assert not hasattr(deepdefend, "gradient_masking")
 
 
 def test_defensive_distillation_fits(untrained_model, batch):

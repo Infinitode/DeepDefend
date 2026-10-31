@@ -72,9 +72,6 @@ attacks and defenses changes, the minor version was bumped.
   for both probability and logit outputs.
 - **`adversarial_logit_pairing`** generates adversarial examples inside the
   training step; the previous implementation paired two models on clean inputs.
-- **`gradient_masking`** no longer crashes on `None` gradients and now emits a
-  `RuntimeWarning` explaining that it is a training regulariser, not an
-  inference-time defense.
 - **`randomized_smoothing`** clips the noisy input, is reproducible when
   seeded, and ships with `smooth_predict()` for Monte-Carlo prediction and a
   certified-radius estimate.
@@ -94,7 +91,7 @@ attacks and defenses changes, the minor version was bumped.
   function is reachable as `deepdefend.<name>`, and `import deepdefend` no
   longer imports TensorFlow.
 - `deepdefend/smooth_predict` for Monte-Carlo randomized smoothing.
-- 164 tests covering attacks, defenses, serialisation, gradients, label
+- 170 tests covering attacks, defenses, serialisation, gradients, label
   formats, input validation and the public API.
 - CI: lint + test matrix (3.10-3.12) + reproducible build on every push and PR.
 - `SECURITY.md`, `CODE_OF_CONDUCT.md`, Dependabot, pre-commit and
@@ -120,6 +117,14 @@ attacks and defenses changes, the minor version was bumped.
 
 ### Removed
 
+- **`gradient_masking`** (and the `GradientMaskingModel` wrapper) has been
+  deleted. It only masked *training* gradients and had no effect on the
+  gradients an attacker computes at inference time — attacks against a wrapped
+  model were bit-identical to attacks against the base model. Gradient masking
+  is a documented false defense (Athalye et al., 2018) that makes a model look
+  robust while leaving it vulnerable, so it does not belong in a robustness
+  library. Mask gradients in your own `train_step` if you want the training
+  regulariser, and never report it as a security measure.
 - The `setup.py`-based `{{VERSION_PLACEHOLDER}}` release mechanism.
 
 ## [0.1.5]

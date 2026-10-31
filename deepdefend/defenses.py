@@ -14,7 +14,6 @@ each function state what the technique does and does not buy you; see also the
 Available functions:
 - `adversarial_training(model, x, y, epsilon=0.01)`: Adversarial Training.
 - `feature_squeezing(model, bit_depth=4)`: Feature Squeezing.
-- `gradient_masking(model, mask_threshold=0.1)`: Gradient Masking (training regulariser, *not* a defense).
 - `input_transformation(model, transformation_function)`: Input Transformation.
 - `defensive_distillation(model, teacher_model, temperature=2)`: Defensive Distillation.
 - `randomized_smoothing(model, noise_level=0.1)`: Randomized Smoothing (inference-time noise).
@@ -34,7 +33,6 @@ Available functions:
 from __future__ import annotations
 
 import math
-import warnings
 
 import numpy as np
 import tensorflow as tf
@@ -56,7 +54,6 @@ __all__ = [
     "feature_denoising",
     "feature_squeezing",
     "gaussian_blur",
-    "gradient_masking",
     "input_transformation",
     "jpeg_compression",
     "median_smoothing",
@@ -580,85 +577,6 @@ def adversarial_training(model, x, y, epsilon=0.01, epochs=10, batch_size=32,
         verbose=verbose, shuffle=shuffle,
     )
     return defended_model
-
-
-@tf.keras.utils.register_keras_serializable(package="deepdefend")
-class GradientMaskingModel(tf.keras.Model):
-    """Training wrapper that drops gradients below ``threshold``.
-
-    .. warning::
-        This is a *training regulariser*, not an adversarial defense.  It does
-        not alter the gradients an attacker computes at inference time.
-    """
-
-    def __init__(self, base_model=None, mask_threshold=0.1, **kwargs):
-        super().__init__(**kwargs)
-        self.base_model = base_model
-        self.mask_threshold = mask_threshold
-
-    def call(self, inputs, training=None):
-        return self.base_model(inputs, training=training)
-
-    def train_step(self, data):
-        x, y = data[0], data[1]
-        with tf.GradientTape() as tape:
-            predictions = self.base_model(x, training=True)
-            loss = self.compiled_loss(y, predictions)
-
-        trainable = self.base_model.trainable_variables
-        gradients = tape.gradient(loss, trainable)
-        pairs = [
-            (tf.where(tf.abs(g) > self.mask_threshold, g, tf.zeros_like(g)), v)
-            for g, v in zip(gradients, trainable) if g is not None
-        ]
-        self.optimizer.apply_gradients(pairs)
-        self.compiled_metrics.update_state(y, predictions)
-        return {m.name: m.result() for m in self.metrics}
-
-    def get_config(self):
-        config = super().get_config()
-        config.update(
-            base_model=tf.keras.utils.serialize_keras_object(self.base_model),
-            mask_threshold=self.mask_threshold,
-        )
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        config = dict(config)
-        config["base_model"] = tf.keras.utils.deserialize_keras_object(config["base_model"])
-        return cls(**config)
-
-
-def gradient_masking(model, mask_threshold=0.1):
-    """
-    Gradient Masking "defense".
-
-    Zeroes training gradients smaller than ``mask_threshold``.
-
-    .. warning::
-        Gradient masking is a well documented **false** defense (Athalye et al.,
-        "Obfuscated Gradients Give a False Sense of Security", 2018).  It has no
-        effect on the gradients an attacker sees, and it can make a model look
-        robust while remaining vulnerable.  Use it only as a training
-        regulariser, never as evidence of robustness.
-
-    Parameters:
-        model (tensorflow.keras.Model): The model to wrap.
-        mask_threshold (float): Threshold below which gradients are zeroed.
-
-    Returns:
-        defended_model (tensorflow.keras.Model): The wrapped model.
-    """
-    mask_threshold = check_float("mask_threshold", mask_threshold, minimum=0.0)
-    warnings.warn(
-        "gradient_masking() does not defend against inference-time attacks; "
-        "it only modifies training gradients. Do not treat it as a robustness "
-        "measure.",
-        RuntimeWarning,
-        stacklevel=2,
-    )
-    return GradientMaskingModel(base_model=model, mask_threshold=mask_threshold)
 
 
 def _temperature_softmax(outputs, temperature, from_logits):
