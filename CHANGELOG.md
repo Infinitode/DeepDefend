@@ -112,8 +112,8 @@ attacks and defenses changes, the minor version was bumped.
   probe directions, `delta=epsilon/5`.
 - `median_smoothing` is documented as an alias of `spatial_smoothing`.
 - The publish workflow uses SHA-pinned actions, a tag/version consistency check,
-  a test gate, `python -m build`, `twine check`, PyPI Trusted Publishing (OIDC)
-  and a protected `pypi` environment.
+  a test gate, `python -m build`, `twine check`, the `PYPI_API_TOKEN` secret and
+  a `pypi` environment. CI runs the full Python matrix only on `master`/`main`.
 
 ### Removed
 

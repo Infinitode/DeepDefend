@@ -34,7 +34,7 @@ either crashed on every call or returned silently wrong results. See
 - Fixed `randomized_smoothing`, `pixel_deflection` and the text helpers being non-reproducible and destroying whitespace/newlines.
 - Fixed silent `NaN`s from invalid parameters such as `bit_depth=0` or `num_bins=0`.
 - Fixed `pip install .` from a checkout, which failed because the version was a placeholder.
-- Fixed the release pipeline: SHA-pinned actions, a tag/version check, a test gate, and PyPI Trusted Publishing instead of a long-lived API token.
+- Fixed the release pipeline: SHA-pinned actions, a tag/version check, a test gate, and PyPI upload via `PYPI_API_TOKEN`.
 
 **Added** — `deepdefend.__version__`, lazy imports, `smooth_predict()` with a
 certified-radius estimate, a 170-test suite, CI, `SECURITY.md`,
