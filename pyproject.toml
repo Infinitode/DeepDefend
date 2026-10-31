@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepdefend"
+version = "0.2.0"
+description = "An open-source Python library for adversarial attacks and defenses in deep learning models, enhancing the security and robustness of AI systems."
+readme = "readme.md"
+requires-python = ">=3.9"
+authors = [{ name = "Infinitode Pty Ltd", email = "infinitode.ltd@gmail.com" }]
+keywords = ["adversarial", "machine-learning", "security", "robustness", "tensorflow", "keras"]
+# MIT plus an extra "substantial changes must ship under a different name"
+# clause, so no stock SPDX identifier fits; LicenseRef-* is the correct SPDX
+# escape hatch for custom licenses.
+license = "LicenseRef-MIT-Modified"
+license-files = ["LICENSE"]
+dependencies = [
+    "numpy>=1.23,<3",
+    "tensorflow>=2.13,<3",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/Infinitode/DeepDefend"
+Documentation = "https://infinitode-docs.gitbook.io/documentation/package-documentation/deepdefend-package-documentation"
+Issues = "https://github.com/Infinitode/DeepDefend/issues"
+
+[tool.setuptools]
+packages = ["deepdefend"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+exclude = [".git", "build", "dist", "venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B008"]
