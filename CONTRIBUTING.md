@@ -22,9 +22,9 @@ Thank you for considering contributing to **DeepDefend**! Contributions, whether
    ruff check .    # lint
    ```
 
-   Both run in CI on every pull request (Python 3.10 – 3.12). New behaviour
-   should come with a test; bug fixes should come with a test that fails
-   before the fix.
+   Pull requests run lint and the Python 3.12 test job. The full 3.10 – 3.12
+   matrix runs on `master`/`main`. New behaviour should come with a test; bug
+   fixes should come with a test that fails before the fix.
 
 > [!TIP]
 > The test-suite uses a tiny synthetic dataset and a small CNN, so the whole
